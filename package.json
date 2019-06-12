@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/opensourcegeek/path-traversal/issues"
   },
-  "homepage": "https://github.com/opensourcegeek/path-traversal#readme"
+  "homepage": "https://github.com/opensourcegeek/path-traversal#readme",
+  "dependencies": {
+    "graphlib": "2.1.7"
+  }
 }

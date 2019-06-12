@@ -1,110 +1,61 @@
+const graphlib = require('graphlib');
 
 
-class Tree {
-  constructor(rootNode) {
-    this.root = rootNode;
-  }
+const linearConfig = () => {
+  let directedG = new graphlib.Graph();
+  // Just list all the props you want to collect in props
+  directedG.setNode('/a', { props: "some-props" });
+  directedG.setNode('/b', { props: "some-props" });
+  directedG.setNode('/c', { props: "some-props" });
+  directedG.setNode('/d', { props: "some-props" });
 
-  find(url) {
-    let currentNode = this.root;
-    while(currentNode !== null) { 
-      if (currentNode.url === url) {
-        return currentNode;
-      }
+  directedG.setEdge('/a', '/b', { validation: "validation-rules" });
+  directedG.setEdge('/b', '/c', { validation: "validation-rules" });
+  directedG.setEdge('/c', '/d', { validation: "validation-rules" });
 
-      for (let [key, node] of currentNode.nodes.entries()) {
-        const foundNode = node.findNode(url);
-        if (foundNode !== undefined) {
-          return foundNode;
-        }
-
-        if (node.next !== null) {
-          currentNode = node;
-          break;
-        }
-      }
-      currentNode = currentNode.next;
-    }
-  }
-
-  addNodeTo(url, node) {
-    const foundNode = this.find(url);
-    console.log(`searching for ${url}`);
-    if (foundNode) {
-      foundNode.addNode(node); 
-    }
-  }
-
-  addNodeAfter(url, node) {
-    const foundNode = this.find(url);
-    if (foundNode) {
-      foundNode.setNextNode(node);
-    }
-  }
-
-  printFullTree() {
-    let currentNode = this.root;
-    while (currentNode !== null) {
-      console.log(currentNode.url);
-      for(let [key, node] of currentNode.nodes.entries()) {
-        console.log('  ', key);
-        if (node.next !== null) {
-          currentNode = node;
-          break;
-        }
-      }
-      currentNode = currentNode.next;
-    }
-  }
+  const allNodesFromA = graphlib.alg.preorder(directedG, '/a'); 
+  console.log('All nodes', allNodesFromA);
 }
 
+const loopyConfig = () => {
+  let directedG = new graphlib.Graph();
+  // Just list all the props you want to collect in props
+  directedG.setNode('/a', { props: "some-props" });
+  directedG.setNode('/b', { props: "some-props" });
+  directedG.setNode('/c', { props: "some-props" });
+  directedG.setNode('/d', { props: "some-props" });
+  directedG.setNode('/e', { props: "some-props" });
 
-class Node {
-  constructor(url, validation, config) {
-    this.url = url;
-    this.validation = validation;
-    this.config = config;
-    this.next = null;
-    this.prev = null;
-    this.nodes = new Map();
-  }
+  directedG.setNode('/f', { props: "some-props" });
+  directedG.setNode('/g', { props: "some-props" });
+  directedG.setNode('/h', { props: "some-props" });
 
-  findNode(url) {
-    for (let [key, node] of this.nodes.entries()) {
-      if (node.url === url) {
-        return node;
-      }
-    }
-  }
+  directedG.setNode('/i', { props: "some-props" });
+  directedG.setNode('/j', { props: "some-props" });
+  directedG.setNode('/k', { props: "some-props" });
 
-  addNode(node) {
-    this.nodes.set(node.url, node);
-  }
+  directedG.setEdge('/a', '/b', { validation: "validation-rules" });
+  directedG.setEdge('/b', '/c', { validation: "validation-rules" });
+  directedG.setEdge('/c', '/d', { validation: "validation-rules" });
+  directedG.setEdge('/d', '/b', { validation: "validation-rules" });
 
-  setNextNode(node) {
-    if (this.next === null) {
-      this.next = node;
-    } else {
-      // adding inbetween
-      let temp = this.next;
-      this.next = node;
-      this.next.next = temp;
-    }
-  }
+  directedG.setEdge('/d', '/e', { validation: "validation-rules" });
+  directedG.setEdge('/e', '/f', { validation: "validation-rules" });
+  directedG.setEdge('/f', '/g', { validation: "validation-rules" });
+  directedG.setEdge('/e', '/h', { validation: "validation-rules" });
+  directedG.setEdge('/h', '/i', { validation: "validation-rules" });
 
+  const allNodesFromA = graphlib.alg.preorder(directedG, '/a'); 
+  console.log('All nodes', allNodesFromA);
+  const cycles = graphlib.alg.findCycles(directedG);
+  console.log(cycles);
+
+  console.log(directedG.edges());
 }
 
-
-const tryTree = () => {
-  const node = new Node('/a', { foo: 'Foo' });
-  let tree = new Tree(node);
-  tree.addNodeAfter('/a', new Node('/b', { boo: 'Boo' }));
-  tree.addNodeAfter('/b', new Node('/c', { foo: 'Foo' }));
-  tree.addNodeTo('/b', new Node('/d', { zoo: 'zoo' }));
-  tree.addNodeTo('/b', new Node('/e', { zoo: 'Bzoo' })); 
-  tree.addNodeAfter('/a', new Node('/z', {zoo: 'zoo'}));
-  tree.addNodeAfter('/d', new Node('/y', {zoo: 'zoo'}));
-  tree.printFullTree();
+const checkAllConfigurations = () => {
+  linearConfig();
+  loopyConfig();
 }
 
-tryTree();
+checkAllConfigurations();
